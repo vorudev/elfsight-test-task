@@ -4,30 +4,33 @@ import { useData } from './providers';
 
 export function Pagination() {
   const { apiURL, info, activePage, setActivePage, setApiURL } = useData();
-const pages = useMemo(() => {
-  if (!info.pages) return [];
-try { 
-  return Array.from({ length: info.pages }, (_, i) => { 
-    const URLWithPage = new URL(apiURL);
-    URLWithPage.searchParams.set('page', i + 1);
-    return URLWithPage;
-  });
-} catch (e) {
-  console.error(e);
-  return [];
-}
-}, [apiURL, info.pages]);
-const pageClickHandler = useCallback((index) => {
-  try { 
-    window.scrollTo({top: 0, behavior: 'smooth'});
-    setActivePage(index);
-    setApiURL(pages[index]);
+  const pages = useMemo(() => {
+    if (!info.pages) return [];
+    try {
+      return Array.from({ length: info.pages }, (_, i) => {
+        const URLWithPage = new URL(apiURL);
+        URLWithPage.searchParams.set('page', i + 1);
 
-  }
-  catch (e) {
-    console.error(e);
-  }
-},[setActivePage, setApiURL, pages]);
+        return URLWithPage;
+      });
+    } catch (e) {
+      console.error(e);
+
+      return [];
+    }
+  }, [apiURL, info.pages]);
+  const pageClickHandler = useCallback(
+    (index) => {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setActivePage(index);
+        setApiURL(pages[index]);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [setActivePage, setApiURL, pages]
+  );
 
   if (pages.length <= 1) return null;
 
@@ -59,7 +62,9 @@ const pageClickHandler = useCallback((index) => {
           {activePage + 1 !== pages.length - 1 && (
             <>
               <Ellipsis>...</Ellipsis>
-              <Page onClick={() => pageClickHandler(pages.length - 1)}>Last »</Page>
+              <Page onClick={() => pageClickHandler(pages.length - 1)}>
+                Last »
+              </Page>
             </>
           )}
         </>
