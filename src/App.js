@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Pagination, ItemsGrid, useData, Header, AppState } from './components';
 
+/* eslint-disable import/no-default-export */
 export default function App() {
   const { isFetching, isError } = useData();
 

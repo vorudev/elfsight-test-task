@@ -20,6 +20,7 @@ export function DataProvider({ children }) {
 
   const getURLParams = useCallback(() => {
     const params = new URLSearchParams(window.location.search);
+
     return {
       name: params.get('name') || '',
       status: params.get('status') || '',
@@ -31,21 +32,21 @@ export function DataProvider({ children }) {
 
   const updateURLParams = useCallback((newFilters, page = 1) => {
     const params = new URLSearchParams();
-    
+
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value && key !== 'page') {
         params.set(key, value);
       }
     });
-    
+
     if (page > 1) {
       params.set('page', page.toString());
     }
-    
-    const newURL = params.toString() 
+
+    const newURL = params.toString()
       ? `${window.location.pathname}?${params.toString()}`
       : window.location.pathname;
-    
+
     window.history.pushState({}, '', newURL);
   }, []);
 
@@ -53,24 +54,24 @@ export function DataProvider({ children }) {
 
   const buildFilteredURL = useCallback((baseURL, filters, page = 1) => {
     const url = new URL(baseURL);
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value && key !== 'page') {
         url.searchParams.set(key, value);
       }
     });
-    
+
     if (page > 1) {
       url.searchParams.set('page', page.toString());
     }
-    
+
     return url.toString();
   }, []);
 
   const fetchData = useCallback(async (url) => {
     setIsFetching(true);
     setIsError(false);
- 
+
     axios
       .get(url)
       .then(({ data }) => {
@@ -85,27 +86,31 @@ export function DataProvider({ children }) {
       });
   }, []);
 
-  const applyFilters = useCallback((newFilters, page = 1) => {
-    setFilters(newFilters);
-    setActivePage(page - 1);
+  const applyFilters = useCallback(
+    (newFilters, page = 1) => {
+      setFilters(newFilters);
+      setActivePage(page - 1);
 
-    updateURLParams(newFilters, page);
-    
-    const filteredURL = buildFilteredURL(API_URL, newFilters, page);
-    setApiURL(filteredURL);
-  }, [buildFilteredURL, updateURLParams]);
+      updateURLParams(newFilters, page);
 
+      const filteredURL = buildFilteredURL(API_URL, newFilters, page);
+      setApiURL(filteredURL);
+    },
+    [buildFilteredURL, updateURLParams]
+  );
 
-  const changePage = useCallback((page) => {
-    const pageNumber = page + 1;
-    setActivePage(page);
-    
-    updateURLParams(filters, pageNumber);
-    
-    const filteredURL = buildFilteredURL(API_URL, filters, pageNumber);
-    setApiURL(filteredURL);
-  }, [filters, buildFilteredURL, updateURLParams]);
+  const changePage = useCallback(
+    (page) => {
+      const pageNumber = page + 1;
+      setActivePage(page);
 
+      updateURLParams(filters, pageNumber);
+
+      const filteredURL = buildFilteredURL(API_URL, filters, pageNumber);
+      setApiURL(filteredURL);
+    },
+    [filters, buildFilteredURL, updateURLParams]
+  );
 
   const clearFilters = useCallback(() => {
     const emptyFilters = {
@@ -116,27 +121,25 @@ export function DataProvider({ children }) {
     };
     setFilters(emptyFilters);
     setActivePage(0);
-    
 
     window.history.pushState({}, '', window.location.pathname);
     setApiURL(API_URL);
   }, []);
 
-
   useEffect(() => {
     const handlePopState = () => {
       const urlFilters = getURLParams();
       const page = parseInt(urlFilters.page) || 1;
-      
+
       setFilters(urlFilters);
       setActivePage(page - 1);
-      
+
       const filteredURL = buildFilteredURL(API_URL, urlFilters, page);
       setApiURL(filteredURL);
     };
 
     window.addEventListener('popstate', handlePopState);
-    
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
@@ -145,13 +148,14 @@ export function DataProvider({ children }) {
   useEffect(() => {
     const urlFilters = getURLParams();
     const page = parseInt(urlFilters.page) || 1;
-    
-    const hasFilters = Object.values(urlFilters).some(value => value && value !== '1');
-    
+
+    const hasFilters = Object.values(urlFilters).some(
+      (value) => value && value !== '1'
+    );
+
     if (hasFilters) {
       setFilters(urlFilters);
       setActivePage(page - 1);
-      
       const filteredURL = buildFilteredURL(API_URL, urlFilters, page);
       setApiURL(filteredURL);
     }
@@ -177,12 +181,12 @@ export function DataProvider({ children }) {
       clearFilters
     }),
     [
-      activePage, 
-      apiURL, 
-      characters, 
-      isFetching, 
-      isError, 
-      info, 
+      activePage,
+      apiURL,
+      characters,
+      isFetching,
+      isError,
+      info,
       fetchData,
       filters,
       applyFilters,
@@ -197,4 +201,5 @@ export function DataProvider({ children }) {
 }
 
 const DataContext = createContext({});
+
 export const useData = () => useContext(DataContext);
