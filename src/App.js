@@ -5,7 +5,7 @@ export default function App() {
   const { isFetching, isError } = useData();
 
   return (
-    <Main> 
+    <Main>
       <Header />
       <AppState />
       {!isFetching && !isError && (
