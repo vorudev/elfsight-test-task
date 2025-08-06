@@ -340,8 +340,14 @@ const DropdownDeselector = styled.button`
   align-items: center;
   justify-content: center;
 
-  &:hover {
-    color: #83bf46;
+  svg {
+    fill: #ffffff;
+    transition: fill 0.2s ease;
+    z-index: 10;
+  }
+
+  &:hover svg {
+    fill: #83bf46;
   }
 `;
 const Select = styled.select`
